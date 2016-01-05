@@ -62,35 +62,35 @@ namespace :pushr do
   desc 'Pushr status.'
   task :status do
     on roles(fetch(:pushr_roles, :all)) do
-      status_message = pid_process_exists? ? "running with pid #{pid}" : 'not running'
+      status_message = pushr_pid_process_exists? ? "running with pid #{pushr_pid}" : 'not running'
       puts "Pushr is #{status_message}!"
     end
   end
 
   ###
 
-  def pid
-    capture pid_command
+  def pushr_pid
+    capture pushr_pid_command
   end
 
-  def pid_command
+  def pushr_pid_command
     "cat #{fetch(:pushr_pid)}"
   end
 
-  def pid_file_exists?
+  def pushr_pid_file_exists?
     test(*("[ -f #{fetch(:pushr_pid)} ]").split(' '))
   end
 
-  def pid_process_exists?
-    pid_file_exists? && test(*("kill -0 `#{pid_command}`").split(' '))
+  def pushr_pid_process_exists?
+    pushr_pid_file_exists? && test(*("kill -0 `#{pushr_pid_command}`").split(' '))
   end
 
   def stop_pushr(signal)
-    return unless test("[ -d #{release_path} ]") && pid_process_exists?
+    return unless test("[ -d #{release_path} ]") && pushr_pid_process_exists?
 
     within release_path do
       puts 'Stopping Pushr...'
-      execute "kill -#{signal} `#{pid_command}`"
+      execute "kill -#{signal} `#{pushr_pid_command}`"
       puts 'done!'
     end
   end
